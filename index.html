@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordenação de Vetor</title>
+    <script>
+        function ordenarVetor(vetor) {
+            vetor.sort((a, b) => a - b);
+            return vetor;
+        }
+
+        function preencherEOrdenar() {
+            let vetor = [];
+            for (let i = 0; i < 10; i++) {
+                let numero = parseInt(prompt(`Digite o ${i + 1}º número:`));
+                vetor.push(numero);
+            }
+
+            document.getElementById("vetorAntes").innerText = "Vetor antes da ordenação: " + vetor.join(", ");
+            let vetorOrdenado = ordenarVetor(vetor);
+            document.getElementById("vetorDepois").innerText = "Vetor após a ordenação: " + vetorOrdenado.join(", ");
+        }
+    </script>
+</head>
+<body>
+    <h1>Preenchimento e Ordenação de Vetor</h1>
+    <button onclick="preencherEOrdenar()">Preencher e Ordenar Vetor</button>
+    
+    <p id="vetorAntes"></p>
+    <p id="vetorDepois"></p>
+</body>
+</html>
