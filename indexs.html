@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Vacinação com Datas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        
+        .panel {
+            flex: 1;
+            min-width: 300px;
+            margin: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            padding: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .panel-header i {
+            margin-right: 10px;
+            font-size: 1.6rem;
+        }
+        
+        .panel-body {
+            padding: 20px;
+            min-height: 300px;
+        }
+        
+        .gripe-panel .panel-header {
+            background: linear-gradient(to right, #1abc9c, #16a085);
+        }
+        
+        .covid-panel .panel-header {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        .controls-panel .panel-header {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+        }
+        
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .menu-btn {
+            padding: 15px;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .menu-btn i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+        
+        .gripe-btn {
+            background: linear-gradient(to right, #1abc9c, #16a085);
+        }
+        
+        .covid-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        .exit-btn {
+            background: linear-gradient(to right, #95a5a6, #7f8c8d);
+        }
+        
+        .fila-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .date-group {
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .date-header {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            padding: 10px 15px;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .person-list {
+            padding: 10px;
+        }
+        
+        .person-item {
+            padding: 10px 15px;
+            margin: 8px 0;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border-left: 4px solid #3498db;
+        }
+        
+        .person-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .person-item.gripe {
+            border-left-color: #1abc9c;
+        }
+        
+        .person-item.covid {
+            border-left-color: #e74c3c;
+        }
+        
+        .empty-queue {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .info-message {
+            background-color: #d6eaf8;
+            color: #2874a6;
+        }
+        
+        .success-message {
+            background-color: #d5f5e3;
+            color: #27ae60;
+        }
+        
+        .error-message {
+            background-color: #fadbd8;
+            color: #c0392b;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #95a5a6, #7f8c8d);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .queue-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .gripe-stat .stat-value {
+            color: #16a085;
+        }
+        
+        .covid-stat .stat-value {
+            color: #c0392b;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .queue-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-syringe"></i> Sistema de Vacinação</h1>
+            <p class="subtitle">Gerenciamento de filas para vacinação contra Gripe e COVID com controle por data</p>
+        </header>
+        
+        <div class="queue-stats">
+            <div class="stat-card gripe-stat">
+                <h3><i class="fas fa-head-side-cough"></i> Fila da Gripe</h3>
+                <div class="stat-value" id="gripe-count">0</div>
+                <p>Pessoas aguardando</p>
+            </div>
+            <div class="stat-card covid-stat">
+                <h3><i class="fas fa-virus"></i> Fila da COVID</h3>
+                <div class="stat-value" id="covid-count">0</div>
+                <p>Pessoas aguardando</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="panel controls-panel">
+                <div class="panel-header">
+                    <i class="fas fa-tasks"></i>
+                    <h2>Menu de Controle</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="menu">
+                        <button class="menu-btn gripe-btn" onclick="openModal('gripe')">
+                            <i class="fas fa-user-plus"></i>
+                            <div>
+                                <strong>1. Cadastrar na Fila da Gripe</strong>
+                                <div>Adicionar pessoa com data</div>
+                            </div>
+                        </button>
+                        
+                        <button class="menu-btn covid-btn" onclick="openModal('covid')">
+                            <i class="fas fa-user-plus"></i>
+                            <div>
+                                <strong>2. Cadastrar na Fila da COVID</strong>
+                                <div>Adicionar pessoa com data</div>
+                            </div>
+                        </button>
+                        
+                        <button class="menu-btn gripe-btn" onclick="chamarPessoa('gripe')">
+                            <i class="fas fa-user-check"></i>
+                            <div>
+                                <strong>3. Chamar para Vacina da Gripe</strong>
+                                <div>Atender próximo da fila</div>
+                            </div>
+                        </button>
+                        
+                        <button class="menu-btn covid-btn" onclick="chamarPessoa('covid')">
+                            <i class="fas fa-user-check"></i>
+                            <div>
+                                <strong>4. Chamar para Vacina da COVID</strong>
+                                <div>Atender próximo da fila</div>
+                            </div>
+                        </button>
+                        
+                        <button class="menu-btn" onclick="mostrarFila('gripe')">
+                            <i class="fas fa-list"></i>
+                            <div>
+                                <strong>5. Mostrar Fila da Gripe</strong>
+                                <div>Exibir todas as pessoas</div>
+                            </div>
+                        </button>
+                        
+                        <button class="menu-btn" onclick="mostrarFila('covid')">
+                            <i class="fas fa-list"></i>
+                            <div>
+                                <strong>6. Mostrar Fila da COVID</strong>
+                                <div>Exibir todas as pessoas</div>
+                            </div>
+                        </button>
+                        
+                        <button class="menu-btn exit-btn" onclick="sair()">
+                            <i class="fas fa-door-open"></i>
+                            <div>
+                                <strong>7. Sair do Programa</strong>
+                                <div>Encerrar o sistema</div>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <div class="message" id="system-message">
+                        <p>Bem-vindo ao Sistema de Vacinação! Selecione uma opção para começar.</p>
+                    </div>
+                    
+                    <div class="instructions">
+                        <h3><i class="fas fa-info-circle"></i> Instruções de Uso</h3>
+                        <ul>
+                            <li>Use as opções 1 e 2 para adicionar pessoas às filas com data específica</li>
+                            <li>As opções 3 e 4 removem a primeira pessoa da respectiva fila (FIFO)</li>
+                            <li>As opções 5 e 6 mostram todas as pessoas na fila agrupadas por data</li>
+                            <li>As datas são automaticamente formatadas como DD/MM/AAAA</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel gripe-panel">
+                <div class="panel-header">
+                    <i class="fas fa-head-side-cough"></i>
+                    <h2>Fila da Vacina contra Gripe</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="fila-container" id="fila-gripe">
+                        <div class="empty-queue">
+                            <i class="fas fa-inbox fa-3x"></i>
+                            <h3>Fila Vazia</h3>
+                            <p>Nenhuma pessoa na fila da gripe</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel covid-panel">
+                <div class="panel-header">
+                    <i class="fas fa-virus"></i>
+                    <h2>Fila da Vacina contra COVID</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="fila-container" id="fila-covid">
+                        <div class="empty-queue">
+                            <i class="fas fa-inbox fa-3x"></i>
+                            <h3>Fila Vazia</h3>
+                            <p>Nenhuma pessoa na fila da COVID</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para cadastro -->
+    <div class="modal" id="cadastro-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Cadastrar Pessoa</h2>
+            </div>
+            <div class="input-group">
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" placeholder="Digite o nome da pessoa">
+            </div>
+            <div class="input-group">
+                <label for="data">Data da Vacinação (DD/MM/AAAA)</label>
+                <input type="text" id="data" placeholder="Ex: 15/07/2024">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="cadastrarPessoa()">Cadastrar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Filas como matrizes [data, pessoa]
+        const filaGripe = [];
+        const filaCovid = [];
+        let currentQueue = '';
+        
+        // Elementos da interface
+        const modal = document.getElementById('cadastro-modal');
+        const nomeInput = document.getElementById('nome');
+        const dataInput = document.getElementById('data');
+        const modalTitle = document.getElementById('modal-title');
+        const messageDiv = document.getElementById('system-message');
+        const gripeCountDiv = document.getElementById('gripe-count');
+        const covidCountDiv = document.getElementById('covid-count');
+        
+        // Formatar data para DD/MM/AAAA
+        function formatarData(data) {
+            const partes = data.split('/');
+            if (partes.length === 3) {
+                return `${partes[0].padStart(2, '0')}/${partes[1].padStart(2, '0')}/${partes[2]}`;
+            }
+            return data;
+        }
+        
+        // Validar data no formato DD/MM/AAAA
+        function validarData(data) {
+            const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (!regex.test(data)) return false;
+            
+            const partes = data.split('/');
+            const dia = parseInt(partes[0], 10);
+            const mes = parseInt(partes[1], 10);
+            const ano = parseInt(partes[2], 10);
+            
+            // Verificação básica de data válida
+            if (ano < 2020 || ano > 2100) return false;
+            if (mes < 1 || mes > 12) return false;
+            if (dia < 1 || dia > 31) return false;
+            
+            return true;
+        }
+        
+        // Abrir modal para cadastro
+        function openModal(queue) {
+            currentQueue = queue;
+            nomeInput.value = '';
+            dataInput.value = '';
+            
+            if (queue === 'gripe') {
+                modalTitle.innerHTML = '<i class="fas fa-head-side-cough"></i> Cadastrar na Fila da Gripe';
+            } else {
+                modalTitle.innerHTML = '<i class="fas fa-virus"></i> Cadastrar na Fila da COVID';
+            }
+            
+            modal.style.display = 'flex';
+            nomeInput.focus();
+        }
+        
+        // Fechar modal
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+        
+        // Cadastrar pessoa na fila selecionada
+        function cadastrarPessoa() {
+            const nome = nomeInput.value.trim();
+            let data = dataInput.value.trim();
+            
+            if (!nome) {
+                showMessage('Por favor, informe o nome da pessoa!', 'error');
+                return;
+            }
+            
+            if (!data) {
+                // Usar data atual se não informada
+                const hoje = new Date();
+                const dia = String(hoje.getDate()).padStart(2, '0');
+                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                const ano = hoje.getFullYear();
+                data = `${dia}/${mes}/${ano}`;
+            } else {
+                if (!validarData(data)) {
+                    showMessage('Formato de data inválido! Use DD/MM/AAAA.', 'error');
+                    return;
+                }
+                data = formatarData(data);
+            }
+            
+            if (currentQueue === 'gripe') {
+                filaGripe.push([data, nome]);
+                showMessage(`${nome} foi adicionado(a) à fila da gripe para ${data}!`, 'success');
+            } else {
+                filaCovid.push([data, nome]);
+                showMessage(`${nome} foi adicionado(a) à fila da COVID para ${data}!`, 'success');
+            }
+            
+            closeModal();
+            updateQueues();
+        }
+        
+        // Chamar pessoa da fila
+        function chamarPessoa(queue) {
+            let fila, tipo;
+            
+            if (queue === 'gripe') {
+                fila = filaGripe;
+                tipo = 'gripe';
+            } else {
+                fila = filaCovid;
+                tipo = 'COVID';
+            }
+            
+            if (fila.length === 0) {
+                showMessage(`Não há pessoas na fila da ${tipo}!`, 'error');
+                return;
+            }
+            
+            // Remove o primeiro elemento da fila (FIFO)
+            const [data, nome] = fila.shift();
+            showMessage(`${nome} foi chamado(a) para vacinação contra ${tipo} (${data})!`, 'success');
+            
+            updateQueues();
+        }
+        
+        // Mostrar fila completa
+        function mostrarFila(queue) {
+            let fila, tipo;
+            
+            if (queue === 'gripe') {
+                fila = filaGripe;
+                tipo = 'Gripe';
+            } else {
+                fila = filaCovid;
+                tipo = 'COVID';
+            }
+            
+            if (fila.length === 0) {
+                showMessage(`Não há pessoas na fila da ${tipo}!`, 'info');
+                return;
+            }
+            
+            // Agrupar por data
+            const grupos = {};
+            fila.forEach(([data, nome]) => {
+                if (!grupos[data]) {
+                    grupos[data] = [];
+                }
+                grupos[data].push(nome);
+            });
+            
+            // Ordenar datas
+            const datas = Object.keys(grupos).sort((a, b) => {
+                const [diaA, mesA, anoA] = a.split('/').map(Number);
+                const [diaB, mesB, anoB] = b.split('/').map(Number);
+                return new Date(anoA, mesA - 1, diaA) - new Date(anoB, mesB - 1, diaB);
+            });
+            
+            // Construir mensagem
+            let mensagem = `Pessoas na fila da ${tipo}:\n\n`;
+            datas.forEach(data => {
+                mensagem += `Data: ${data}\n`;
+                grupos[data].forEach((nome, index) => {
+                    mensagem += `  ${index + 1}. ${nome}\n`;
+                });
+                mensagem += '\n';
+            });
+            
+            showMessage(mensagem, 'info');
+        }
+        
+        // Sair do programa
+        function sair() {
+            if (filaGripe.length > 0 || filaCovid.length > 0) {
+                if (confirm('Há pessoas nas filas! Deseja realmente sair?')) {
+                    showMessage('Programa encerrado. Obrigado!', 'info');
+                }
+            } else {
+                showMessage('Programa encerrado. Obrigado!', 'info');
+            }
+        }
+        
+        // Atualizar exibição das filas
+        function updateQueues() {
+            // Atualizar contadores
+            gripeCountDiv.textContent = filaGripe.length;
+            covidCountDiv.textContent = filaCovid.length;
+            
+            // Atualizar fila da gripe
+            const gripeContainer = document.getElementById('fila-gripe');
+            if (filaGripe.length === 0) {
+                gripeContainer.innerHTML = `
+                    <div class="empty-queue">
+                        <i class="fas fa-inbox fa-3x"></i>
+                        <h3>Fila Vazia</h3>
+                        <p>Nenhuma pessoa na fila da gripe</p>
+                    </div>
+                `;
+            } else {
+                // Agrupar por data
+                const grupos = {};
+                filaGripe.forEach(([data, nome]) => {
+                    if (!grupos[data]) {
+                        grupos[data] = [];
+                    }
+                    grupos[data].push(nome);
+                });
+                
+                // Ordenar datas
+                const datas = Object.keys(grupos).sort((a, b) => {
+                    const [diaA, mesA, anoA] = a.split('/').map(Number);
+                    const [diaB, mesB, anoB] = b.split('/').map(Number);
+                    return new Date(anoA, mesA - 1, diaA) - new Date(anoB, mesB - 1, diaB);
+                });
+                
+                // Construir HTML
+                let html = '';
+                datas.forEach(data => {
+                    html += `
+                        <div class="date-group">
+                            <div class="date-header">
+                                <span><i class="fas fa-calendar-day"></i> ${data}</span>
+                                <span>${grupos[data].length} pessoa(s)</span>
+                            </div>
+                            <div class="person-list">
+                    `;
+                    
+                    grupos[data].forEach(nome => {
+                        html += `
+                            <div class="person-item gripe">
+                                <span><i class="fas fa-user"></i> ${nome}</span>
+                                <span>${data}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                gripeContainer.innerHTML = html;
+            }
+            
+            // Atualizar fila da COVID
+            const covidContainer = document.getElementById('fila-covid');
+            if (filaCovid.length === 0) {
+                covidContainer.innerHTML = `
+                    <div class="empty-queue">
+                        <i class="fas fa-inbox fa-3x"></i>
+                        <h3>Fila Vazia</h3>
+                        <p>Nenhuma pessoa na fila da COVID</p>
+                    </div>
+                `;
+            } else {
+                // Agrupar por data
+                const grupos = {};
+                filaCovid.forEach(([data, nome]) => {
+                    if (!grupos[data]) {
+                        grupos[data] = [];
+                    }
+                    grupos[data].push(nome);
+                });
+                
+                // Ordenar datas
+                const datas = Object.keys(grupos).sort((a, b) => {
+                    const [diaA, mesA, anoA] = a.split('/').map(Number);
+                    const [diaB, mesB, anoB] = b.split('/').map(Number);
+                    return new Date(anoA, mesA - 1, diaA) - new Date(anoB, mesB - 1, diaB);
+                });
+                
+                // Construir HTML
+                let html = '';
+                datas.forEach(data => {
+                    html += `
+                        <div class="date-group">
+                            <div class="date-header">
+                                <span><i class="fas fa-calendar-day"></i> ${data}</span>
+                                <span>${grupos[data].length} pessoa(s)</span>
+                            </div>
+                            <div class="person-list">
+                    `;
+                    
+                    grupos[data].forEach(nome => {
+                        html += `
+                            <div class="person-item covid">
+                                <span><i class="fas fa-user"></i> ${nome}</span>
+                                <span>${data}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                covidContainer.innerHTML = html;
+            }
+        }
+        
+        // Mostrar mensagem no sistema
+        function showMessage(text, type = 'info') {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message';
+            messageDiv.classList.add(`${type}-message`);
+            
+            // Limpar mensagem após alguns segundos
+            setTimeout(() => {
+                if (messageDiv.textContent === text) {
+                    messageDiv.textContent = '';
+                    messageDiv.className = 'message';
+                }
+            }, 5000);
+        }
+        
+        // Inicializar o sistema
+        function init() {
+            // Adicionar alguns dados de exemplo
+            filaGripe.push(['15/07/2024', 'Ana Silva']);
+            filaGripe.push(['15/07/2024', 'Carlos Oliveira']);
+            filaGripe.push(['16/07/2024', 'Mariana Santos']);
+            
+            filaCovid.push(['15/07/2024', 'Pedro Almeida']);
+            filaCovid.push(['17/07/2024', 'Juliana Costa']);
+            
+            updateQueues();
+        }
+        
+        // Iniciar quando o documento estiver carregado
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
