@@ -1,102 +1,90 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Vacinação</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-        }
-        .menu {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        button {
-            padding: 12px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .filas {
-            display: flex;
-            justify-content: space-between;
-        }
-        .fila {
-            width: 48%;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 6px;
-            background-color: white;
-        }
-        h2 {
-            color: #16a085;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        h3 {
-            margin-top: 0;
-            color: #2c3e50;
-        }
-        #mensagem {
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Calculadora de Regras de 3</title>
+  <style>
+    body {
+      background-color: #e8f5f8;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 40px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 80px;
+      height: 30px;
+      font-size: 18px;
+      margin: 5px;
+      padding: 5px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 5px 15px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    small {
+      display: block;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Sistema de Controle de Vacinação</h1>
-        
-        <div class="menu">
-            <button onclick="cadastrarGripe()">1- Cadastrar na Fila da Gripe</button>
-            <button onclick="cadastrarCovid()">2- Cadastrar na Fila da COVID</button>
-            <button onclick="chamarGripe()">3- Chamar para Vacina da Gripe</button>
-            <button onclick="chamarCovid()">4- Chamar para Vacina da COVID</button>
-            <button onclick="mostrarGripe()">5- Mostrar Fila da Gripe</button>
-            <button onclick="mostrarCovid()">6- Mostrar Fila da COVID</button>
-            <button onclick="sair()" style="grid-column: span 2; background-color: #e74c3c;">7- Sair do Programa</button>
-        </div>
 
-        <div id="mensagem"></div>
+  <div class="container">
+    <h1>Calculadora de Regras de 3</h1>
 
-        <div class="filas">
-            <div class="fila">
-                <h2>Fila da Vacina contra Gripe</h2>
-                <div id="fila-gripe"></div>
-            </div>
-            <div class="fila">
-                <h2>Fila da Vacina contra COVID</h2>
-                <div id="fila-covid"></div>
-            </div>
-        </div>
-    </div>
+    <input type="number" id="a" placeholder="a">
+    ----- 
+    <input type="number" id="b" placeholder="b">
+    <br>
+    <input type="number" id="c" placeholder="c">
+    -----
+    x
+    <br>
 
-    <script src="index.js"></script>
+    <button onclick="calcular()">Calcular x</button>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    function calcular() {
+      const a = parseFloat(document.getElementById("a").value);
+      const b = parseFloat(document.getElementById("b").value);
+      const c = parseFloat(document.getElementById("c").value);
+
+      if (isNaN(a) || isNaN(b) || isNaN(c)) {
+        document.getElementById("resultado").innerHTML = "Por favor, preencha todos os valores corretamente.";
+        return;
+      }
+
+      const x = (b * c) / a;
+      document.getElementById("resultado").innerHTML = `x é igual a <strong>${x}</strong>.`;
+    }
+  </script>
+
 </body>
 </html>
