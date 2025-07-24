@@ -1,90 +1,116 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Calculadora de Regras de 3</title>
-  <style>
-    body {
-      background-color: #e8f5f8;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    .container {
-      background-color: white;
-      padding: 30px;
-      max-width: 600px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-      font-size: 40px;
-      font-weight: bold;
-    }
-
-    input {
-      width: 80px;
-      height: 30px;
-      font-size: 18px;
-      margin: 5px;
-      padding: 5px;
-    }
-
-    button {
-      font-size: 18px;
-      padding: 5px 15px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    #resultado {
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    small {
-      display: block;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Básica</title>
+    <style>
+        .calculator {
+            max-width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin: 15px 0;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #result {
+            margin: 15px 0;
+            padding: 10px;
+            min-height: 20px;
+            border: 1px solid #eee;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
+    <div class="calculator">
+        <h2>Calculadora</h2>
+        <input type="number" id="num1" placeholder="Primeiro número">
+        <input type="number" id="num2" placeholder="Segundo número">
+        
+        <div class="buttons">
+            <button id="add">+</button>
+            <button id="subtract">-</button>
+            <button id="multiply">*</button>
+            <button id="divide">/</button>
+        </div>
+        
+        <div id="result">Aguardando valores...</div>
+        
+        <button id="clear">Limpar</button>
+    </div>
 
-  <div class="container">
-    <h1>Calculadora de Regras de 3</h1>
+    <script>
+        // Selecionar elementos
+        const num1Input = document.getElementById('num1');
+        const num2Input = document.getElementById('num2');
+        const resultDiv = document.getElementById('result');
+        const addButton = document.getElementById('add');
+        const subtractButton = document.getElementById('subtract');
+        const multiplyButton = document.getElementById('multiply');
+        const divideButton = document.getElementById('divide');
+        const clearButton = document.getElementById('clear');
 
-    <input type="number" id="a" placeholder="a">
-    ----- 
-    <input type="number" id="b" placeholder="b">
-    <br>
-    <input type="number" id="c" placeholder="c">
-    -----
-    x
-    <br>
+        // Funções matemáticas
+        const add = () => calculate((a, b) => a + b);
+        const subtract = () => calculate((a, b) => a - b);
+        const multiply = () => calculate((a, b) => a * b);
+        const divide = () => calculate((a, b) => {
+            if (b === 0) throw new Error('Divisão por zero!');
+            return a / b;
+        });
 
-    <button onclick="calcular()">Calcular x</button>
+        // Função principal de cálculo
+        function calculate(operation) {
+            try {
+                const num1 = parseFloat(num1Input.value);
+                const num2 = parseFloat(num2Input.value);
+                
+                if (isNaN(num1) || isNaN(num2)) {
+                    throw new Error('Por favor, insira números válidos em ambos os campos');
+                }
+                
+                const result = operation(num1, num2);
+                resultDiv.textContent = `Resultado: ${result}`;
+                resultDiv.style.color = 'black';
+                
+            } catch (error) {
+                resultDiv.textContent = `Erro: ${error.message}`;
+                resultDiv.style.color = 'red';
+            }
+        }
 
-    <div id="resultado"></div>
-  </div>
+        // Função para limpar
+        function clearCalculator() {
+            num1Input.value = '';
+            num2Input.value = '';
+            resultDiv.textContent = 'Aguardando valores...';
+            resultDiv.style.color = 'black';
+        }
 
-  <script>
-    function calcular() {
-      const a = parseFloat(document.getElementById("a").value);
-      const b = parseFloat(document.getElementById("b").value);
-      const c = parseFloat(document.getElementById("c").value);
-
-      if (isNaN(a) || isNaN(b) || isNaN(c)) {
-        document.getElementById("resultado").innerHTML = "Por favor, preencha todos os valores corretamente.";
-        return;
-      }
-
-      const x = (b * c) / a;
-      document.getElementById("resultado").innerHTML = `x é igual a <strong>${x}</strong>.`;
-    }
-  </script>
-
+        // Adicionar event listeners
+        addButton.addEventListener('click', add);
+        subtractButton.addEventListener('click', subtract);
+        multiplyButton.addEventListener('click', multiply);
+        divideButton.addEventListener('click', divide);
+        clearButton.addEventListener('click', clearCalculator);
+    </script>
 </body>
 </html>
